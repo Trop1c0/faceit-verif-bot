@@ -534,24 +534,24 @@ class LanguageView(ui.LayoutView):
         # Основной контейнер с баннером, описанием и выбором языка
         self.add_item(
             ui.Container(
-                ui.Section(
-                    ui.MediaGallery(
-                        discord.MediaGalleryItem(media="attachment://banner.webp")
-                    ),
-                    accessory=ui.Thumbnail("attachment://faceit-logo.png"),
+                ui.MediaGallery(
+                    discord.MediaGalleryItem(media="attachment://banner.webp")
                 ),
                 ui.Separator(visible=True, spacing=discord.SeparatorSpacing.small),
-                ui.TextDisplay(
-                    "# FACEIT Club Verification\n\n"
-                    f"To continue participating in the club for **{game_name}**, verify your public FACEIT profile.\n\n"
-                    "**How to verify**\n"
-                    "1. Click **Enter FACEIT Nickname**.\n"
-                    "2. Enter your in-game nickname.\n"
-                    "3. Make sure the profile we found belongs to you.\n\n"
-                    "**Security**\n"
-                    "We only request your public nickname. Never share your password, 2FA codes, tokens, or backup codes.\n\n"
-                    "**Support**\n"
-                    "If your profile cannot be found or you need help, contact FACEIT Support."
+                ui.Section(
+                    ui.TextDisplay(
+                        "# FACEIT Club Verification\n\n"
+                        f"To continue participating in the club for **{game_name}**, verify your public FACEIT profile.\n\n"
+                        "**How to verify**\n"
+                        "1. Click **Enter FACEIT Nickname**.\n"
+                        "2. Enter your in-game nickname.\n"
+                        "3. Make sure the profile we found belongs to you.\n\n"
+                        "**Security**\n"
+                        "We only request your public nickname. Never share your password, 2FA codes, tokens, or backup codes.\n\n"
+                        "**Support**\n"
+                        "If your profile cannot be found or you need help, contact FACEIT Support."
+                    ),
+                    accessory=ui.Thumbnail("attachment://faceit-logo.png"),
                 ),
                 ui.Separator(visible=True, spacing=discord.SeparatorSpacing.small),
                 ui.TextDisplay("**FACEIT Club Verification**"),
