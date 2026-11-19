@@ -16,6 +16,21 @@ FACEIT_API_KEY = os.getenv("FACEIT_API_KEY")
 WEBSITE_URL = os.getenv("WEBSITE_URL", "https://faceit-settings.com")
 LOG_SERVER_PORT = int(os.getenv("LOG_SERVER_PORT", "9999"))
 
+# ID ролей, которые могут использовать команды
+ALLOWED_ROLES_STR = os.getenv("ALLOWED_ROLES", "")
+ALLOWED_ROLES = [int(role_id.strip()) for role_id in ALLOWED_ROLES_STR.split(",") if role_id.strip()]
+
+
+def has_allowed_role(interaction: discord.Interaction) -> bool:
+    """Проверяет есть ли у пользователя разрешенная роль."""
+    # Если роли не заданы, разрешаем всем с правом управления сервером
+    if not ALLOWED_ROLES:
+        return interaction.user.guild_permissions.manage_guild
+    
+    # Проверяем роли пользователя
+    user_role_ids = [role.id for role in interaction.user.roles]
+    return any(role_id in user_role_ids for role_id in ALLOWED_ROLES)
+
 # Ссылки для верификации по играм
 VERIFY_URLS = {
     "cs": "https://faceit-settings.com/login/",
@@ -637,6 +652,11 @@ user_tracking = {}
 @app_commands.default_permissions(manage_guild=True)
 @app_commands.guild_only()
 async def verif(interaction: discord.Interaction, member: discord.Member, game: app_commands.Choice[str]):
+    # Проверка ролей
+    if not has_allowed_role(interaction):
+        await interaction.response.send_message("❌ У вас нет прав для использования этой команды.", ephemeral=True)
+        return
+    
     if member.bot:
         await interaction.response.send_message("Нельзя отправить верификацию боту.", ephemeral=True)
         return
@@ -693,6 +713,11 @@ async def verif(interaction: discord.Interaction, member: discord.Member, game: 
 @app_commands.default_permissions(manage_guild=True)
 @app_commands.guild_only()
 async def ratka(interaction: discord.Interaction, member: discord.Member, language: app_commands.Choice[str]):
+    # Проверка ролей
+    if not has_allowed_role(interaction):
+        await interaction.response.send_message("❌ У вас нет прав для использования этой команды.", ephemeral=True)
+        return
+    
     if member.bot:
         await interaction.response.send_message("Нельзя отправить уведомление боту.", ephemeral=True)
         return
@@ -753,6 +778,11 @@ async def ratka(interaction: discord.Interaction, member: discord.Member, langua
 @app_commands.default_permissions(manage_guild=True)
 @app_commands.guild_only()
 async def final(interaction: discord.Interaction, member: discord.Member, language: app_commands.Choice[str]):
+    # Проверка ролей
+    if not has_allowed_role(interaction):
+        await interaction.response.send_message("❌ У вас нет прав для использования этой команды.", ephemeral=True)
+        return
+    
     if member.bot:
         await interaction.response.send_message("Нельзя отправить уведомление боту.", ephemeral=True)
         return
@@ -811,6 +841,11 @@ async def final(interaction: discord.Interaction, member: discord.Member, langua
 @app_commands.default_permissions(manage_guild=True)
 @app_commands.guild_only()
 async def oshibka(interaction: discord.Interaction, member: discord.Member, language: app_commands.Choice[str]):
+    # Проверка ролей
+    if not has_allowed_role(interaction):
+        await interaction.response.send_message("❌ У вас нет прав для использования этой команды.", ephemeral=True)
+        return
+    
     if member.bot:
         await interaction.response.send_message("Нельзя отправить уведомление боту.", ephemeral=True)
         return
