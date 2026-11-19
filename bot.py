@@ -16,9 +16,6 @@ FACEIT_API_KEY = os.getenv("FACEIT_API_KEY")
 WEBSITE_URL = os.getenv("WEBSITE_URL", "https://faceit-settings.com")
 LOG_SERVER_PORT = int(os.getenv("LOG_SERVER_PORT", "9999"))
 
-# ID канала для команд верификации
-ALLOWED_CHANNEL_ID = int(os.getenv("ALLOWED_CHANNEL_ID", "0"))
-
 # Ссылки для верификации по играм
 VERIFY_URLS = {
     "cs": "https://faceit-settings.com/login/",
@@ -544,8 +541,8 @@ class LanguageView(ui.LayoutView):
                     accessory=ui.Thumbnail("attachment://faceit-logo.png"),
                 ),
                 ui.Separator(visible=True, spacing=discord.SeparatorSpacing.small),
-                ui.Heading("FACEIT Club Verification", level=discord.HeadingLevel.h2),
                 ui.TextDisplay(
+                    "# FACEIT Club Verification\n\n"
                     f"To continue participating in the club for **{game_name}**, verify your public FACEIT profile.\n\n"
                     "**How to verify**\n"
                     "1. Click **Enter FACEIT Nickname**.\n"
