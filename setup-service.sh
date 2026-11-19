@@ -5,7 +5,7 @@ echo "============================================"
 echo ""
 
 # Получаем текущего пользователя и директорию
-CURRENT_USER=$(whoami)
+CURRENT_USER="root"
 CURRENT_DIR=$(pwd)
 VENV_PYTHON="$CURRENT_DIR/venv/bin/python"
 
@@ -25,7 +25,7 @@ fi
 SERVICE_FILE="/etc/systemd/system/faceit-bot.service"
 
 echo "📝 Создание файла сервиса..."
-sudo bash -c "cat > $SERVICE_FILE" <<EOF
+cat > $SERVICE_FILE <<EOF
 [Unit]
 Description=FACEIT Verification Discord Bot
 After=network.target
@@ -48,21 +48,21 @@ echo ""
 
 # Перезагрузка systemd
 echo "🔄 Перезагрузка systemd..."
-sudo systemctl daemon-reload
+systemctl daemon-reload
 
 # Включение автозапуска
 echo "🔧 Включение автозапуска..."
-sudo systemctl enable faceit-bot
+systemctl enable faceit-bot
 
 echo ""
 echo "✅ Настройка завершена!"
 echo ""
 echo "📝 Управление ботом:"
-echo "  Запустить:    sudo systemctl start faceit-bot"
-echo "  Остановить:   sudo systemctl stop faceit-bot"
-echo "  Перезапуск:   sudo systemctl restart faceit-bot"
-echo "  Статус:       sudo systemctl status faceit-bot"
-echo "  Логи:         sudo journalctl -u faceit-bot -f"
+echo "  Запустить:    systemctl start faceit-bot"
+echo "  Остановить:   systemctl stop faceit-bot"
+echo "  Перезапуск:   systemctl restart faceit-bot"
+echo "  Статус:       systemctl status faceit-bot"
+echo "  Логи:         journalctl -u faceit-bot -f"
 echo ""
 echo "⚠️  ВАЖНО: Убедитесь что .env файл настроен перед запуском!"
 echo ""

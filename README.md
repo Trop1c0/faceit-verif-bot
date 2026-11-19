@@ -89,7 +89,7 @@ nano .env
 sudo nano /etc/systemd/system/faceit-bot.service
 ```
 
-Содержимое:
+Содержимое (замените `/root/faceit-bot` если установили в другую папку):
 
 ```ini
 [Unit]
@@ -98,18 +98,16 @@ After=network.target
 
 [Service]
 Type=simple
-User=ваш_username
-WorkingDirectory=/home/ваш_username/faceit-boy
-Environment="PATH=/home/ваш_username/faceit-boy/venv/bin"
-ExecStart=/home/ваш_username/faceit-boy/venv/bin/python3 bot.py
+User=root
+WorkingDirectory=/root/faceit-bot
+Environment="PATH=/root/faceit-bot/venv/bin"
+ExecStart=/root/faceit-bot/venv/bin/python3 bot.py
 Restart=always
 RestartSec=10
 
 [Install]
 WantedBy=multi-user.target
 ```
-
-Замените `ваш_username` на ваше имя пользователя!
 
 ### Запуск сервиса
 
