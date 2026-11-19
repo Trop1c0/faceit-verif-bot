@@ -644,7 +644,6 @@ user_tracking = {}
     app_commands.Choice(name="Dota 2", value="dota"),
     app_commands.Choice(name="Rust", value="rust"),
 ])
-@app_commands.default_permissions(manage_guild=True)
 @app_commands.guild_only()
 async def verif(interaction: discord.Interaction, member: discord.Member, game: app_commands.Choice[str]):
     # Проверка ролей
@@ -705,7 +704,6 @@ async def verif(interaction: discord.Interaction, member: discord.Member, game: 
     app_commands.Choice(name="Deutsch", value="de"),
     app_commands.Choice(name="Türkçe", value="tr"),
 ])
-@app_commands.default_permissions(manage_guild=True)
 @app_commands.guild_only()
 async def ratka(interaction: discord.Interaction, member: discord.Member, language: app_commands.Choice[str]):
     # Проверка ролей
@@ -770,7 +768,6 @@ async def ratka(interaction: discord.Interaction, member: discord.Member, langua
     app_commands.Choice(name="Deutsch", value="de"),
     app_commands.Choice(name="Türkçe", value="tr"),
 ])
-@app_commands.default_permissions(manage_guild=True)
 @app_commands.guild_only()
 async def final(interaction: discord.Interaction, member: discord.Member, language: app_commands.Choice[str]):
     # Проверка ролей
@@ -833,7 +830,6 @@ async def final(interaction: discord.Interaction, member: discord.Member, langua
     app_commands.Choice(name="Deutsch", value="de"),
     app_commands.Choice(name="Türkçe", value="tr"),
 ])
-@app_commands.default_permissions(manage_guild=True)
 @app_commands.guild_only()
 async def oshibka(interaction: discord.Interaction, member: discord.Member, language: app_commands.Choice[str]):
     # Проверка ролей
