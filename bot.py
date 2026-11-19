@@ -357,7 +357,7 @@ def result_message(lang: str, game: str, player: dict, verify_url: str) -> Tuple
     }
     country_flag = country_flags.get(country_code, "🌍")
     
-    # Создаём LayoutView с той же структурой
+    # Создаём LayoutView с обновлённой структурой
     class ResultView(ui.LayoutView):
         def __init__(self):
             super().__init__(timeout=None)
@@ -373,22 +373,10 @@ def result_message(lang: str, game: str, player: dict, verify_url: str) -> Tuple
                         f"▪️ **Country:** {country_code} {country_flag}\n"
                         f"▪️ **Member since:** {member_since}"
                     ),
-                    ui.ActionRow(
-                        ui.Button(
-                            label="Not my FaceIT account",
-                            style=discord.ButtonStyle.secondary,
-                            custom_id="not_my_account"
-                        ),
-                        ui.Button(
-                            label="Verify account",
-                            style=discord.ButtonStyle.link,
-                            url=verify_url,
-                        ),
-                    ),
                 )
             )
             
-            # Дополнительный контейнер внизу с кнопкой перехода на ссылку
+            # Контейнер внизу с кнопками "Go to FACEIT" и "Not my FaceIT account"
             self.add_item(
                 ui.Container(
                     ui.TextDisplay(
@@ -401,6 +389,11 @@ def result_message(lang: str, game: str, player: dict, verify_url: str) -> Tuple
                             style=discord.ButtonStyle.link,
                             url=verify_url,
                             emoji=discord.PartialEmoji(name="🔗")
+                        ),
+                        ui.Button(
+                            label="Not my FaceIT account",
+                            style=discord.ButtonStyle.secondary,
+                            custom_id="not_my_account"
                         ),
                     ),
                 )
@@ -486,37 +479,8 @@ class LanguageRow(ui.ActionRow):
         custom_id="faceit:enter_nickname"
     )
     async def enter_nickname(self, interaction: discord.Interaction, button: ui.Button):
-        # Показываем выбор языка
-        lang_view = LanguageSelectView(self.game)
-        await interaction.response.send_message(
-            "🌐 **Select your language / Выберите язык**",
-            view=lang_view,
-            ephemeral=True
-        )
-
-
-class LanguageSelectView(discord.ui.View):
-    def __init__(self, game: str):
-        super().__init__(timeout=180)
-        self.game = game
-
-    @discord.ui.select(
-        placeholder="Select language...",
-        options=[
-            discord.SelectOption(label=v["label"], value=k, emoji=v["emoji"])
-            for k, v in LANGUAGES.items()
-        ],
-    )
-    async def language_select(self, interaction: discord.Interaction, select: discord.ui.Select):
-        # Обновляем лог: выбран язык
-        if interaction.user.id in user_tracking:
-            lang_name = LANGUAGES[select.values[0]]["label"]
-            user_tracking[interaction.user.id]["log"].append(
-                f"{discord.utils.format_dt(discord.utils.utcnow(), 'T')} | Выбран язык: **{lang_name}**"
-            )
-            await update_tracking_log(interaction.user.id)
-        
-        await interaction.response.send_modal(NicknameModal(select.values[0], self.game))
+        # Сразу показываем модальное окно с английским языком по умолчанию
+        await interaction.response.send_modal(NicknameModal("en", self.game))
 
 
 class LanguageView(ui.LayoutView):
